@@ -340,13 +340,15 @@ struct chip8 {
     var state = State()
     
     mutating func execute() {
-        
+
     }
-    
-    mutating func loadMemory(data: UnsafePointer<Void>, length: UInt16, address: UInt16 = State.baseAddress) {
+
+    mutating func loadROM(path: String) -> (UInt16) {
+        let data = NSData(contentsOfFile: path.stringByExpandingTildeInPath)
         state.memory.withUnsafeMutableBufferPointer { (ptr) -> () in
-            memcpy(ptr.baseAddress, data, UInt(length)); ()
+            memcpy(0x200 + ptr.baseAddress, data!.bytes, UInt(data!.length)); ()
         }
+        return UInt16(data!.length)
     }
     
     func disassembleMemoryRange(range: Range<UInt16>) -> [Instruction] {
